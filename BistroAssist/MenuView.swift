@@ -46,7 +46,7 @@ struct FoodMenuView_Previews: PreviewProvider {
             drinkItems: [
                 FoodMenuItem(name: "Water", price: 1.99),
                 FoodMenuItem(name: "Soda", price: 2.99),
-                // ... Add other drink items here for the preview
+               
             ]
         )
     }
