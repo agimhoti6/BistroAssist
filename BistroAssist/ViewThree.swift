@@ -7,12 +7,12 @@ struct TableButton: View {
     var body: some View {
         Button(action: action) {
             ZStack {
-                // Table representation
+                
                 Rectangle()
                     .foregroundColor(.brown)
                     .aspectRatio(1, contentMode: .fit)
 
-                // Chairs around the table
+                
                 VStack {
                     HStack {
                         ChairView()
@@ -26,9 +26,9 @@ struct TableButton: View {
                         ChairView()
                     }
                 }
-                .padding(8) // Padding to create space for chairs
+                .padding(8) 
 
-                // Table number
+               
                 Text("Table \(tableNumber)")
                     .foregroundColor(.white)
                     .bold()
@@ -123,7 +123,7 @@ struct ViewThree: View {
                          let drinkItems = icons.filter { drinkNames.contains($0.name) }
                          .map { $0.foodMenuItem }
                          
-                         // Debugging output
+                         
                          print("Food items: \(foodItems)")
                          print("Drink items: \(drinkItems)")
                          
@@ -138,7 +138,7 @@ struct ViewThree: View {
                          .navigationBarTitle("Floor Layout", displayMode: .inline)
                          .navigationBarHidden(true)
                          
-                         // Modify this NavigationLink to pass the icons to TableDetailView
+                         
                          NavigationLink(destination: TableDetailView(tableNumber: selectedTable ?? 0, icons: icons), isActive: Binding(
                          get: { self.selectedTable != nil },
                          set: { _ in self.selectedTable = nil }
@@ -147,7 +147,7 @@ struct ViewThree: View {
                          }
                          .hidden()
                          
-                         // NavigationLink for showing MenuView remains unchanged
+                         
                          }
                          .navigationBarBackButtonHidden(true)
                          .navigationBarHidden(true)
@@ -164,5 +164,5 @@ struct ViewThree_Previews: PreviewProvider {
     }
 }
 
-// FoodMenuView is as previously defined
+
 
