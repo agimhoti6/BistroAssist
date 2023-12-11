@@ -5,14 +5,14 @@ struct TableDetailView: View {
     let icons: [Icon]
     @State private var selectedItemQuantities: [UUID: Int] = [:]
 
-    let taxRate: Double = 0.08875 // Tax rate of 8.875%
+    let taxRate: Double = 0.08875 
 
     // Define the grid layout
     let gridLayout: [GridItem] = Array(repeating: .init(.flexible()), count: 3)
 
     var body: some View {
         VStack {
-            // Upper half with light red background
+            
             ScrollView {
                 LazyVGrid(columns: gridLayout, spacing: 10) {
                     ForEach(icons) { icon in
@@ -34,7 +34,7 @@ struct TableDetailView: View {
             }
             .background(Color.lightRed)
 
-            // Bottom half with white background
+            
             List {
                 ForEach(getSortedMenuItems(), id: \.item.id) { (quantity, item) in
                     HStack {
@@ -46,7 +46,7 @@ struct TableDetailView: View {
                 .onDelete(perform: removeItems)
             }
 
-            // Fixed position subtotal, tax, and total
+            
             VStack(alignment: .trailing) {
             
                 HStack {
@@ -68,7 +68,7 @@ struct TableDetailView: View {
         .navigationBarTitle("Table \(tableNumber)", displayMode: .inline)
     }
 
-    // Helper function to get sorted menu items based on selected quantities
+    
     private func getSortedMenuItems() -> [(quantity: Int, item: FoodMenuItem)] {
         return selectedItemQuantities.compactMap { (key, value) -> (Int, FoodMenuItem)? in
             guard let item = icons.first(where: { $0.foodMenuItem.id == key })?.foodMenuItem else { return nil }
@@ -76,7 +76,7 @@ struct TableDetailView: View {
         }.sorted { $0.item.name < $1.item.name }
     }
 
-    // Helper function to calculate the subtotal
+    
     private func calculateSubtotal() -> Double {
         return selectedItemQuantities.reduce(0) { result, pair in
             if let item = icons.first(where: { $0.foodMenuItem.id == pair.key })?.foodMenuItem {
@@ -95,7 +95,7 @@ struct TableDetailView: View {
 
 }
 
-// Define a light red color
+
 extension Color {
     static let lightRed = Color(red: 1.0, green: 0.8, blue: 0.8)
 }
