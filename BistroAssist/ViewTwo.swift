@@ -7,7 +7,7 @@ struct ViewTwo: View {
     @State private var isActive: Bool = false
 
     var body: some View {
-        NavigationView { // Wrap the content in a NavigationView
+        NavigationView { 
             ZStack {
                 Color(.lightGray)
                     .edgesIgnoringSafeArea(.all)
@@ -17,7 +17,7 @@ struct ViewTwo: View {
                         .font(.headline)
                         .padding(.bottom, 20)
                 
-                    // Use the PinCodeView here
+                    
                     PinCodeView(enteredPin: $enteredPin)
                 
                     Button(action: {
@@ -36,14 +36,14 @@ struct ViewTwo: View {
                     }
                     .padding()
                 
-                    NavigationLink(destination: ViewThree().navigationBarBackButtonHidden(true), isActive: $isActive) { // Here we hide the back button
+                    NavigationLink(destination: ViewThree().navigationBarBackButtonHidden(true), isActive: $isActive) { 
                         EmptyView()
                     }
                     .hidden()
                 }
             }
-            .navigationBarHidden(true) // Hide the navigation bar on ViewTwo if desired
+            .navigationBarHidden(true) 
         }
-        .navigationViewStyle(StackNavigationViewStyle()) // Use stack style to disable swipe to dismiss if needed
+        .navigationViewStyle(StackNavigationViewStyle()) 
     }
 }
