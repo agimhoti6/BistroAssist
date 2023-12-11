@@ -7,7 +7,7 @@ struct TableDetailView: View {
 
     let taxRate: Double = 0.08875 
 
-    // Define the grid layout
+    
     let gridLayout: [GridItem] = Array(repeating: .init(.flexible()), count: 3)
 
     var body: some View {
