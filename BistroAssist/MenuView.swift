@@ -40,13 +40,18 @@ struct FoodMenuView_Previews: PreviewProvider {
         FoodMenuView(
             foodItems: [
                 FoodMenuItem(name: "Pizza", price: 7.99),
-                FoodMenuItem(name: "Burger", price: 5.99),
-                // ... Add other food items here for the preview
+                FoodMenuItem(name: "Hamburger", price: 5.99),
+                FoodMenuItem(name: "Pasta", price: 8.99),
+                FoodMenuItem(name: "Salad", price: 10.99),
+                FoodMenuItem(name: "Steak", price: 8.99),
+                FoodMenuItem(name: "Sushi", price: 10.99),
+                
             ],
             drinkItems: [
                 FoodMenuItem(name: "Water", price: 1.99),
-                FoodMenuItem(name: "Soda", price: 2.99),
-               
+                FoodMenuItem(name: "Beer", price: 2.99),
+                FoodMenuItem(name: "Wine", price: 7.99),
+                
             ]
         )
     }
