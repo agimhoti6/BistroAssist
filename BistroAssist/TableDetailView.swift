@@ -1,102 +1,139 @@
 import SwiftUI
 
 struct TableDetailView: View {
+    @EnvironmentObject var restaurantManager: RestaurantManager
     var tableNumber: Int
     let icons: [Icon]
     @State private var selectedItemQuantities: [UUID: Int] = [:]
 
-    let taxRate: Double = 0.08875 
-
-    
-    let gridLayout: [GridItem] = Array(repeating: .init(.flexible()), count: 3)
+    let taxRate: Double = 0.08875
+    @State private var isCheckoutViewPresented: Bool = false
 
     var body: some View {
-        VStack {
-            
-            ScrollView {
-                LazyVGrid(columns: gridLayout, spacing: 10) {
-                    ForEach(icons) { icon in
-                        Button(action: {
-                            // Increment the count for the selected item
-                            self.selectedItemQuantities[icon.foodMenuItem.id, default: 0] += 1
-                        }) {
-                            Image(icon.imageName)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 100, height: 100)
-                                .padding(.bottom, 10)
+        NavigationView {
+            VStack {
+                ScrollView {
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                        ForEach(icons) { icon in
+                            Button(action: {
+                                selectedItemQuantities[icon.foodMenuItem.id, default: 0] += 1
+                            }) {
+                                Image(icon.imageName)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 100, height: 100)
+                                    .padding(.bottom, 10)
+                                    .background(Color.white)
+                                    .cornerRadius(10)
+                            }
                         }
-                        .background(Color.white)
-                        .cornerRadius(10)
-                    }
-                }
-                .padding()
-            }
-            .background(Color.lightRed)
-
-            
-            List {
-                ForEach(getSortedMenuItems(), id: \.item.id) { (quantity, item) in
-                    HStack {
-                        Text("\(quantity)x \(item.name)")
-                        Spacer()
-                        Text("$\(Double(quantity) * item.price, specifier: "%.2f")")
-                    }
-                }
-                .onDelete(perform: removeItems)
-            }
-
-            
-            VStack(alignment: .trailing) {
-            
-                HStack {
-                    Spacer()
-                    VStack(alignment: .trailing) {
-                        let subtotal = calculateSubtotal()
-                        let tax = subtotal * taxRate
-                        let total = subtotal + tax
-
-                        Text("Subtotal: $\(subtotal, specifier: "%.2f")")
-                        Text("Tax: $\(tax, specifier: "%.2f")")
-                        Text("Total: $\(total, specifier: "%.2f")")
                     }
                     .padding()
                 }
-                .background(Color.gray.opacity(0.1))
+                .background(Color.red)
+
+                List {
+                    Section(header: Text("Selected Items")) {
+                        ForEach(selectedItems, id: \.item.id) { (quantity, item) in
+                            HStack {
+                                Text("\(quantity)x \(item.name)")
+                                Spacer()
+                                Text("$\(Double(quantity) * item.price, specifier: "%.2f")")
+                            }
+                        }
+                        .onDelete(perform: removeItems)
+                    }
+
+                    Section(header: Text("Processed Items")) {
+                        ForEach(processedItems, id: \.item.id) { (quantity, item) in
+                            HStack {
+                                Text("\(quantity)x \(item.name)")
+                                Spacer()
+                                Text("$\(Double(quantity) * item.price, specifier: "%.2f")")
+                            }
+                        }
+                    }
+                }
+
+                VStack(alignment: .trailing) {
+                    HStack {
+                        Spacer()
+                        VStack(alignment: .trailing) {
+                            let subtotal = calculateTotal()
+                            let tax = subtotal * taxRate
+                            let total = subtotal + tax
+
+                            Text("Subtotal: $\(subtotal, specifier: "%.2f")")
+                            Text("Tax: $\(tax, specifier: "%.2f")")
+                            Text("Total: $\(total, specifier: "%.2f")")
+                        }
+                        .padding()
+                    }
+                    .background(Color.gray.opacity(0.1))
+                }
+
+                Spacer()
+
+                HStack {
+                    Spacer()
+                    Button("Send Order") {
+                        sendSelectedItems()
+                    }
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 20)
+                    Spacer()
+
+                    Button("Checkout") {
+                        isCheckoutViewPresented = true
+                    }
+                    .padding(.leading, 20)
+                    .padding(.bottom, 20)
+                    Spacer()
+                }
+
+                NavigationLink(destination: CheckoutView(selectedItems: combinedItems, taxRate: taxRate), isActive: $isCheckoutViewPresented) {
+                    EmptyView()
+                }
+                .hidden()
             }
+            .navigationBarTitle("Table \(tableNumber)", displayMode: .inline)
         }
-        .navigationBarTitle("Table \(tableNumber)", displayMode: .inline)
     }
 
-    
-    private func getSortedMenuItems() -> [(quantity: Int, item: FoodMenuItem)] {
-        return selectedItemQuantities.compactMap { (key, value) -> (Int, FoodMenuItem)? in
+    private var selectedItems: [(quantity: Int, item: FoodMenuItem)] {
+        selectedItemQuantities.compactMap { (key, value) -> (Int, FoodMenuItem)? in
             guard let item = icons.first(where: { $0.foodMenuItem.id == key })?.foodMenuItem else { return nil }
             return (value, item)
-        }.sorted { $0.item.name < $1.item.name }
+        }
+        .sorted { $0.item.name < $1.item.name }
     }
 
-    
-    private func calculateSubtotal() -> Double {
-        return selectedItemQuantities.reduce(0) { result, pair in
-            if let item = icons.first(where: { $0.foodMenuItem.id == pair.key })?.foodMenuItem {
-                return result + (Double(pair.value) * item.price)
-            }
-            return result
+    private var processedItems: [(quantity: Int, item: FoodMenuItem)] {
+        restaurantManager.getProcessedOrders(forTable: tableNumber).compactMap { itemId, quantity -> (Int, FoodMenuItem)? in
+            guard let item = icons.first(where: { $0.foodMenuItem.id == itemId })?.foodMenuItem else { return nil }
+            return (quantity, item)
         }
     }
-    
+
+    private var combinedItems: [(quantity: Int, item: FoodMenuItem)] {
+        selectedItems + processedItems
+    }
+
+    private func calculateTotal() -> Double {
+        combinedItems.reduce(0) { result, pair in
+            result + (Double(pair.quantity) * pair.item.price)
+        }
+    }
+
+    private func sendSelectedItems() {
+        restaurantManager.sendItems(forTable: tableNumber, itemQuantities: selectedItemQuantities)
+        selectedItemQuantities.removeAll()
+    }
+
     func removeItems(at offsets: IndexSet) {
         for index in offsets {
-            let itemId = getSortedMenuItems()[index].item.id
-            selectedItemQuantities[itemId] = nil
+            let itemId = selectedItems[index].item.id
+            selectedItemQuantities.removeValue(forKey: itemId)
         }
     }
-
 }
-
-
-extension Color {
-    static let lightRed = Color(red: 1.0, green: 0.8, blue: 0.8)
-}
-
