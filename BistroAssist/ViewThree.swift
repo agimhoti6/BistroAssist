@@ -28,21 +28,21 @@ struct TableButton: View {
                 }
                 .padding(8) 
 
-               
+                
                 Text("Table \(tableNumber)")
                     .foregroundColor(.white)
                     .bold()
-                    .font(.caption) // Smaller text
+                    .font(.caption) 
             }
         }
-        .frame(width: 100, height: 100) // Set the frame for Button to contain the table and chairs
+        .frame(width: 100, height: 100)
     }
 }
 
 struct ChairView: View {
     var body: some View {
         Circle()
-            .frame(width: 15, height: 15) // Representation of a chair
+            .frame(width: 15, height: 15)
             .foregroundColor(.blue)
     }
 }
@@ -64,9 +64,9 @@ struct ViewThree: View {
         Icon(name: "Pasta", imageName: "pasta", foodMenuItem: FoodMenuItem(name: "Pasta", price: 8.99)),
         Icon(name: "Sushi", imageName: "sushi", foodMenuItem: FoodMenuItem(name: "Sushi", price: 10.99)),
         Icon(name: "Steak", imageName: "steak", foodMenuItem: FoodMenuItem(name: "Steak", price: 8.99)),
-        Icon(name: "Water", imageName: "water", foodMenuItem: FoodMenuItem(name: "water", price: 10.99)),
+        Icon(name: "Water", imageName: "water", foodMenuItem: FoodMenuItem(name: "Water", price: 10.99)),
         Icon(name: "Beer", imageName: "beer", foodMenuItem: FoodMenuItem(name: "Beer", price: 10.99)),
-        Icon(name: "Wine", imageName: "wine", foodMenuItem: FoodMenuItem(name: "wine", price: 10.99)),
+        Icon(name: "Wine", imageName: "wine", foodMenuItem: FoodMenuItem(name: "Wine", price: 10.99)),
         
         
     ]
@@ -114,25 +114,35 @@ struct ViewThree: View {
                          let drinkItems = icons.filter { drinkNames.contains($0.name) }
                          .map { $0.foodMenuItem }
                          */
-                         Button("Menu") {
-                         let foodNames: Set<String> = ["Pizza", "Hamburger", "Salad", "Pasta", "Sushi", "Steak"]
-                         let drinkNames: Set<String> = ["Water", "Beer", "Wine"]
-                         
-                         let foodItems = icons.filter { foodNames.contains($0.name) }
-                         .map { $0.foodMenuItem }
-                         let drinkItems = icons.filter { drinkNames.contains($0.name) }
-                         .map { $0.foodMenuItem }
-                         
-                         
-                         print("Food items: \(foodItems)")
-                         print("Drink items: \(drinkItems)")
-                         
-                         self.showMenuView = true
-                         }
-                         .foregroundColor(.white)
-                         .padding()
-                         .background(Color.blue)
-                         .cornerRadius(10)
+                        Button("Menu") {
+                            // Navigate to the FoodMenuView when the "Menu" button is clicked
+                            self.showMenuView = true
+                        }
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                        .sheet(isPresented: $showMenuView) {
+                            FoodMenuView(
+                                foodItems: [
+                                    FoodMenuItem(name: "Pizza", price: 7.99),
+                                    FoodMenuItem(name: "Hamburger", price: 5.99),
+                                    FoodMenuItem(name: "Pasta", price: 8.99),
+                                    FoodMenuItem(name: "Salad", price: 10.99),
+                                    FoodMenuItem(name: "Steak", price: 8.99),
+                                    FoodMenuItem(name: "Sushi", price: 10.99),
+
+
+                                ],
+                                drinkItems: [
+                                    FoodMenuItem(name: "Water", price: 1.99),
+                                    FoodMenuItem(name: "Beer", price: 2.99),
+                                    FoodMenuItem(name: "Wine", price: 7.99),
+
+                                ]
+                            )
+                        }
+
                          Spacer()
                          
                          .navigationBarTitle("Floor Layout", displayMode: .inline)
@@ -163,6 +173,4 @@ struct ViewThree_Previews: PreviewProvider {
         ViewThree().environmentObject(RootViewModel())
     }
 }
-
-
 
